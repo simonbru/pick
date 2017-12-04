@@ -1,6 +1,7 @@
 #-*-coding:utf-8-*-
 
 # import curses
+from .screen_win import Screen
 
 __all__ = ['Picker', 'pick']
 
@@ -40,6 +41,8 @@ class Picker(object):
 
         self.index = default_index
         self.custom_handlers = {}
+
+        self.screen = Screen()
 
     def register_custom_handler(self, key, func):
         self.custom_handlers[key] = func
@@ -133,20 +136,16 @@ class Picker(object):
 
     def draw(self):
         """draw the curses ui on the screen, handle scroll if needed"""
-        self._screen_clear()
-
         lines, current_line = self.get_lines()
-        print('')
+        self.screen.add_line('')
         for line in lines:
-            if type(line) is tuple:
-                print(' ' + line[0])
-            else:
-                print(' ' + line)
+            self.screen.add_line(' ' + line)
+        self.screen.refresh()
 
     def run_loop(self):
         while True:
             self.draw()
-            c = self._getch()
+            c = self.screen.getch()
             if c in KEYS_UP:
                 self.move_up()
             elif c in KEYS_DOWN:
@@ -161,19 +160,6 @@ class Picker(object):
                 ret = self.custom_handlers[c](self)
                 if ret:
                     return ret
-
-    def _getch(self):
-        import msvcrt
-        char = msvcrt.getch()
-        if char in (b'\x00', b'\xe0'):
-            char += msvcrt.getch()
-            return char
-        else:
-            return ord(char)
-
-    @staticmethod
-    def _screen_clear():
-        print('\x1b[2J\x1b[H', end='')
 
     def start(self):
         # TODO: something
