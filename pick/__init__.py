@@ -163,7 +163,9 @@ class Picker(object):
 
     def start(self):
         # TODO: something
-        return self.run_loop()
+        result = self.run_loop()
+        print()
+        return result
 
 
 def pick(options, title=None, indicator='*', default_index=0, multi_select=False, min_selection_count=0):
