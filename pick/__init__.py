@@ -107,38 +107,26 @@ class Picker(object):
         current_line = self.index + len(title_lines) + 1
         return lines, current_line
 
-    # def draw(self):
-    #     """draw the curses ui on the screen, handle scroll if needed"""
-    #     self._screen_clear()
-    #
-    #     x, y = 1, 1  # start point
-    #     max_y, max_x = self.screen.getmaxyx()
-    #     max_rows = max_y - y  # the max rows we can draw
-    #
-    #     lines, current_line = self.get_lines()
-    #
-    #     # calculate how many lines we should scroll, relative to the top
-    #     scroll_top = getattr(self, 'scroll_top', 0)
-    #     if current_line <= scroll_top:
-    #         scroll_top = 0
-    #     elif current_line - scroll_top > max_rows:
-    #         scroll_top = current_line - max_rows
-    #     self.scroll_top = scroll_top
-    #
-    #     lines_to_draw = lines[scroll_top:scroll_top+max_rows]
-    #
-    #     for line in lines_to_draw:
-    #         if type(line) is tuple:
-    #             self.screen.addnstr(y, x, line[0], max_x-2, line[1])
-    #         else:
-    #             self.screen.addnstr(y, x, line, max_x-2)
-    #         y += 1
-
     def draw(self):
         """draw the curses ui on the screen, handle scroll if needed"""
-        lines, current_line = self.get_lines()
+
+        # Add one line of margin
         self.screen.add_line('')
-        for line in lines:
+        max_rows = self.screen.rows - 1
+
+        lines, current_line = self.get_lines()
+
+        # calculate how many lines we should scroll, relative to the top
+        scroll_top = getattr(self, 'scroll_top', 0)
+        if current_line <= scroll_top:
+            scroll_top = 0
+        elif current_line - scroll_top > max_rows:
+            scroll_top = current_line - max_rows
+        self.scroll_top = scroll_top
+
+        lines_to_draw = lines[scroll_top:scroll_top + max_rows]
+
+        for line in lines_to_draw:
             self.screen.add_line(' ' + line)
         self.screen.refresh()
 
